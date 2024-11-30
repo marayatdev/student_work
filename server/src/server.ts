@@ -6,6 +6,7 @@ import cors from "cors";
 import morgan from "morgan";
 import fs from "fs";
 import path from "path";
+import prisma from "./config/connectDb";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ class App {
     this.setup();
     this.initializeRoutes();
     this.startServer();
+    this.initializeDatabase();
   }
 
   private setup(): void {
@@ -66,6 +68,16 @@ class App {
     this.app.listen(this.port, () => {
       logInfo(`🚀 Server is running on http://localhost:${this.port}`);
     });
+  }
+
+  private async initializeDatabase(): Promise<void> {
+    try {
+      await prisma.$connect();
+      logInfo("💾 Connected to the database");
+    } catch (error) {
+      logError(`Database connection error: ${error}`);
+      throw new Error(`Database connection error: ${error}`);
+    }
   }
 }
 
